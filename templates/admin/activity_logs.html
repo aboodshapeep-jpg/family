@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Activity Logs - Family Platform Admin{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2><i class="fas fa-history"></i> Activity Logs</h2>
+    <p class="text-muted">System audit trail and user activities</p>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="user" placeholder="Search by username..." value="{{ filter_user }}">
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" name="action">
+                    <option value="all">All Actions</option>
+                    {% for action in actions %}
+                        <option value="{{ action }}" {% if filter_action == action %}selected{% endif %}>{{ action }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Filter
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a href="{{ url_for('admin.activity_logs') }}" class="btn btn-secondary w-100">
+                    <i class="fas fa-redo"></i> Reset
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Logs Table -->
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover table-sm">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Description</th>
+                    <th>IP Address</th>
+                    <th>User Agent</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs.items %}
+                    <tr>
+                        <td><small>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
+                        <td>
+                            {% if log.user %}
+                                <i class="fas fa-user-circle"></i> {{ log.user.username }}
+                            {% else %}
+                                <span class="text-muted">Unknown</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if 'SUCCESS' in log.action %}
+                                <span class="badge bg-success">{{ log.action }}</span>
+                            {% elif 'FAILED' in log.action %}
+                                <span class="badge bg-danger">{{ log.action }}</span>
+                            {% else %}
+                                <span class="badge bg-info">{{ log.action }}</span>
+                            {% endif %}
+                        </td>
+                        <td><small>{{ log.description or '-' }}</small></td>
+                        <td><small>{{ log.ip_address }}</small></td>
+                        <td><small class="text-muted" title="{{ log.user_agent }}">{{ log.user_agent[:40] }}...</small></td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No activity logs found</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if logs.pages > 1 %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if logs.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin.activity_logs', page=logs.prev_num, action=filter_action, user=filter_user) }}">
+                        Previous
+                    </a>
+                </li>
+            {% endif %}
+            
+            {% for page_num in logs.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num == logs.page %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('admin.activity_logs', page=page_num, action=filter_action, user=filter_user) }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            
+            {% if logs.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin.activity_logs', page=logs.next_num, action=filter_action, user=filter_user) }}">
+                        Next
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}
+{% endblock %}

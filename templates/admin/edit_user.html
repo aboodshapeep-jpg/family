@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit User - Family Platform Admin{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2><i class="fas fa-edit"></i> Edit User</h2>
+    <p class="text-muted">Update user information and permissions</p>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                User Information
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.edit_user', user_id=user.id) }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name or '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name or '' }}">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="role_id" class="form-label">Role</label>
+                            <select class="form-select" id="role_id" name="role_id" required>
+                                {% for role in roles %}
+                                    <option value="{{ role.id }}" {% if role.id == user.role_id %}selected{% endif %}>{{ role.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="is_active" class="form-label">Status</label>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {% if user.is_active %}checked{% endif %}>
+                                <label class="form-check-label" for="is_active">
+                                    Active Account
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header">
+                Reset Password
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.reset_password', user_id=user.id) }}">
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="new_password" name="new_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100">
+                        <i class="fas fa-key"></i> Reset Password
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                Account Details
+            </div>
+            <div class="card-body">
+                <p><strong>Created:</strong> {{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p><strong>Last Updated:</strong> {{ user.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p><strong>Last Login:</strong> {% if user.last_login %}{{ user.last_login.strftime('%Y-%m-%d %H:%M') }}{% else %}<span class="text-muted">Never</span>{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
