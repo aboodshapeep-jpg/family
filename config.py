@@ -1,45 +1,45 @@
 import os
 from datetime import timedelta
 
-class BaseConfig:
-    SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-change-in-production')
-    DEBUG = False
-    TESTING = False
-    
-    # Database
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///family.db')
+class Config:
+    """Base configuration"""
+    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
-    # Session
-    PERMANENT_SESSION_LIFETIME = timedelta(days=7)
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
-    
-    # Admin email (You - the administrator)
-    ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@familyplatform.com')
+    REMEMBER_COOKIE_DURATION = timedelta(days=7)
+    REMEMBER_COOKIE_SECURE = True
+    REMEMBER_COOKIE_HTTPONLY = True
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
 
-class DevelopmentConfig(BaseConfig):
+class DevelopmentConfig(Config):
+    """Development configuration"""
     DEBUG = True
-    ENV = 'development'
-    SESSION_COOKIE_SECURE = False  # Allow non-HTTPS in development
-    SQLALCHEMY_ECHO = True
+    TESTING = False
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///family.db')
+    SESSION_COOKIE_SECURE = False
+    REMEMBER_COOKIE_SECURE = False
 
-class TestingConfig(BaseConfig):
-    DEBUG = True
+class ProductionConfig(Config):
+    """Production configuration"""
+    DEBUG = False
+    TESTING = False
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    if not SQLALCHEMY_DATABASE_URI:
+        raise ValueError("DATABASE_URL environment variable not set")
+
+class TestingConfig(Config):
+    """Testing configuration"""
     TESTING = True
-    ENV = 'testing'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     WTF_CSRF_ENABLED = False
+    SESSION_COOKIE_SECURE = False
+    REMEMBER_COOKIE_SECURE = False
 
-class ProductionConfig(BaseConfig):
-    DEBUG = False
-    ENV = 'production'
-    SESSION_COOKIE_SECURE = True
-    
 config = {
     'development': DevelopmentConfig,
-    'testing': TestingConfig,
     'production': ProductionConfig,
+    'testing': TestingConfig,
     'default': DevelopmentConfig
 }
