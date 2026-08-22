@@ -1,0 +1,24 @@
+<div class="col-md-2 sidebar">
+    <div class="mb-4">
+        <h5 class="text-white ps-3">Admin Panel</h5>
+        <hr class="bg-secondary">
+    </div>
+    <nav class="nav flex-column">
+        <a href="{{ url_for('admin.dashboard') }}" class="nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+            <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin.users') }}" class="nav-link {% if request.endpoint == 'admin.users' %}active{% endif %}">
+            <i class="fas fa-users"></i> Manage Users
+        </a>
+        <a href="{{ url_for('admin.add_user') }}" class="nav-link {% if request.endpoint == 'admin.add_user' %}active{% endif %}">
+            <i class="fas fa-user-plus"></i> Add User
+        </a>
+        <a href="{{ url_for('admin.activity_logs') }}" class="nav-link {% if request.endpoint == 'admin.activity_logs' %}active{% endif %}">
+            <i class="fas fa-history"></i> Activity Logs
+        </a>
+        <hr class="bg-secondary">
+        <a href="{{ url_for('auth.logout') }}" class="nav-link">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </nav>
+</div>
